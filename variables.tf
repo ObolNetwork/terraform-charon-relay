@@ -6,6 +6,7 @@ variable "relay_name" {
 variable "cluster_size" {
   description = "The number of the nodes in a relay cluster"
   type        = string
+  default     = "1"
 }
 
 variable "relay_version" {
@@ -44,10 +45,12 @@ variable "loki_endpoint" {
 variable "haproxy_chart_version" {
   description = "Haproxy helm chart version"
   type        = string
+  default     = "0.6.11"
 }
 variable "haproxy_replicas_count" {
   description = "The number of haproxy replicas"
   type        = string
+  default     = "1"
 }
 
 variable "node_selector_enabled" {
