@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.77.0 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
+    rev: v1.77.1 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
     hooks:
       - id: terraform_fmt
       - id: terraform_docs
@@ -8,5 +8,3 @@ repos:
         args:
           - --args=--disable-rule=terraform_required_providers
           - --args=--disable-rule=terraform_required_version
-      #- id: terraform_tfsec
-      #- id: terraform_checkov
