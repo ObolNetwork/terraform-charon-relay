@@ -1,5 +1,5 @@
 module "relay-1" {
-  source        = "git::git@github.com:ObolNetwork/terraform-charon-relay.git?ref=v0.1.0"
+  source        = "git::https://github.com/ObolNetwork/terraform-charon-relay.git?ref=v0.1.0"
   relay_name    = "relay-1"
   relay_version = "v0.14.3"
   cluster_size  = 3
