@@ -102,6 +102,8 @@ resource "kubernetes_ingress_v1" "haproxy-external" {
       "cert-manager.io/cluster-issuer"                 = "letsencrypt"
       "nginx.ingress.kubernetes.io/app-root"           = "/enr"
       "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
+      "cert-manager.io/issue-temporary-certificate"    = "true"
+      "acme.cert-manager.io/http01-edit-in-place"      = "true"
     }
   }
 
