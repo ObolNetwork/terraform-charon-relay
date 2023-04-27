@@ -15,8 +15,9 @@ variable "relay_version" {
 }
 
 variable "external_ips" {
-  description = "value"
+  description = "List of public static IPs created in GCP only"
   type        = list(string)
+  default     = null
 }
 
 variable "base_dns" {
@@ -30,14 +31,8 @@ variable "secondary_dns" {
   default     = ""
 }
 
-variable "udp_enabled" {
-  description = "Enable relay udp connectivity"
-  type        = string
-  default     = false
-}
-
 variable "loki_endpoint" {
-  description = "value"
+  description = "The loki endpoint to push logs to it."
   type        = string
   default     = ""
 }
@@ -56,5 +51,35 @@ variable "haproxy_replicas_count" {
 variable "node_selector_enabled" {
   description = "Enable node selector"
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "storageclass" {
+  description = "k8s pv storage class (standard, gp2, etc)"
+  type        = string
+  default     = "standard"
+}
+
+variable "memory_limits" {
+  description = "relay pod memory limits"
+  default     = "1Gi"
+  type        = string
+}
+
+variable "memory_requests" {
+  description = "relay pod memory requests"
+  default     = "1Gi"
+  type        = string
+}
+
+variable "cpu_limits" {
+  description = "relay pod cpu limits"
+  default     = null
+  type        = string
+}
+
+variable "cpu_requests" {
+  description = "relay pod cpu requests"
+  default     = "500m"
+  type        = string
 }
