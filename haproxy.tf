@@ -84,7 +84,7 @@ EOF
 resource "null_resource" "backend_servers" {
   count = var.cluster_size
   triggers = {
-    server = var.external_ips != null ? "  server ${var.relay_name}-${count.index} ${var.external_ips[count.index]}:3640 check  inter 10s  fall 12  rise 2": "  server ${var.relay_name}-${count.index} ${kubernetes_service_v1.relay-tcp[count.index].status[0].load_balancer[0].ingress[0].hostname}:3640 check  inter 10s  fall 12  rise 2"
+    server = var.external_ips != null ? "  server ${var.relay_name}-${count.index} ${var.external_ips[count.index]}:3640 check  inter 10s  fall 12  rise 2" : "  server ${var.relay_name}-${count.index} ${kubernetes_service_v1.relay-tcp[count.index].status[0].load_balancer[0].ingress[0].hostname}:3640 check  inter 10s  fall 12  rise 2"
   }
 }
 
