@@ -43,57 +43,49 @@ resource "kubernetes_stateful_set_v1" "relay" {
   metadata {
     name      = "${var.relay_name}-${count.index}"
     namespace = kubernetes_namespace_v1.relay.id
-
     labels = {
       app = "${var.relay_name}-${count.index}"
     }
   }
-
   spec {
     replicas = 1
-
     selector {
       match_labels = {
         app = "${var.relay_name}-${count.index}"
       }
     }
-
     template {
       metadata {
         labels = {
           app = "${var.relay_name}-${count.index}"
         }
       }
-
       spec {
         container {
           name        = "${var.relay_name}-${count.index}"
           image       = "ghcr.io/obolnetwork/charon:${var.relay_version}"
-          command     = ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-ip=${var.external_ips[count.index]}"]
+          command     = var.external_ips != null ? ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-ip=${var.external_ips[count.index]}"] : ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-hostname=${kubernetes_service_v1.relay-tcp[count.index].status[0].load_balancer[0].ingress[0].hostname}"]
           working_dir = "/charon"
-
           env_from {
             config_map_ref {
               name = "${var.relay_name}-${count.index}"
             }
           }
-
           resources {
             limits = {
-              memory = "1Gi"
+              cpu    = var.cpu_limits
+              memory = var.memory_limits
             }
 
             requests = {
-              cpu    = "500m"
-              memory = "1Gi"
+              cpu    = var.cpu_requests
+              memory = var.memory_requests
             }
           }
-
           volume_mount {
             name       = "data"
             mount_path = "/charon"
           }
-
           liveness_probe {
             http_get {
               path = "/livez"
@@ -103,7 +95,6 @@ resource "kubernetes_stateful_set_v1" "relay" {
             initial_delay_seconds = 5
             period_seconds        = 1
           }
-
           readiness_probe {
             http_get {
               path = "/readyz"
@@ -113,28 +104,18 @@ resource "kubernetes_stateful_set_v1" "relay" {
             initial_delay_seconds = 3
             period_seconds        = 1
           }
-
           image_pull_policy = "Always"
         }
-
         security_context {
           run_as_user = 0
         }
-
         node_selector = var.node_selector_enabled ? {
           node_pool = var.relay_name
         } : null
-
-        toleration {
-          effect = "NoSchedule"
-          key    = var.relay_name
-          value  = "true"
-        }
         automount_service_account_token = false
         enable_service_links            = false
       }
     }
-
     volume_claim_template {
       metadata {
         name      = "data"
@@ -143,7 +124,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
 
       spec {
         access_modes       = ["ReadWriteOnce"]
-        storage_class_name = "vmstandard"
+        storage_class_name = var.storageclass
         resources {
           requests = {
             storage = "1Gi"
@@ -151,7 +132,6 @@ resource "kubernetes_stateful_set_v1" "relay" {
         }
       }
     }
-
     service_name = "${var.relay_name}-${count.index}"
   }
   depends_on = [kubernetes_namespace_v1.relay, resource.helm_release.haproxy, kubernetes_config_map_v1.relay]
@@ -162,13 +142,11 @@ resource "kubernetes_service_v1" "relay-tcp" {
   metadata {
     name      = "${var.relay_name}-${count.index}-tcp"
     namespace = kubernetes_namespace_v1.relay.id
-    annotations = {
+    annotations = var.external_ips != null ? {
       "cloud.google.com/neg" = "{\"ingress\":true}"
-    }
+    } : null
   }
-
-  wait_for_load_balancer = false
-
+  wait_for_load_balancer = true
   spec {
     port {
       name        = "p2p-tcp"
@@ -176,57 +154,23 @@ resource "kubernetes_service_v1" "relay-tcp" {
       port        = 3610
       target_port = "3610"
     }
-
     port {
       name        = "monitoring"
       protocol    = "TCP"
       port        = 3620
       target_port = "3620"
     }
-
     port {
       name        = "bootnode-http"
       protocol    = "TCP"
       port        = 3640
       target_port = "3640"
     }
-
     selector = {
       app = "${var.relay_name}-${count.index}"
     }
-
     type                    = "LoadBalancer"
-    load_balancer_ip        = var.external_ips[count.index]
-    external_traffic_policy = "Local"
-  }
-}
-
-resource "kubernetes_service_v1" "relay-udp" {
-  count = var.udp_enabled ? var.cluster_size : 0
-  metadata {
-    name      = "${var.relay_name}-${count.index}-udp"
-    namespace = kubernetes_namespace_v1.relay.id
-    annotations = {
-      "cloud.google.com/neg" = "{\"ingress\":true}"
-    }
-  }
-
-  wait_for_load_balancer = false
-
-  spec {
-    port {
-      name        = "p2p-udp"
-      protocol    = "UDP"
-      port        = 3630
-      target_port = "3630"
-    }
-
-    selector = {
-      app = "${var.relay_name}-${count.index}"
-    }
-
-    type                    = "LoadBalancer"
-    load_balancer_ip        = var.external_ips[count.index]
+    load_balancer_ip        = var.external_ips != null ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
   }
 }
