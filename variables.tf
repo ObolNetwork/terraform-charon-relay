@@ -92,6 +92,6 @@ variable "cpu_requests" {
 
 variable "wait_for_load_balancer" {
   description = ""
-  default = "true"
-  type = string
+  default     = "true"
+  type        = string
 }
