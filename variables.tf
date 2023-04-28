@@ -25,6 +25,12 @@ variable "base_dns" {
   type        = string
 }
 
+variable "udp_enabled" {
+  description = "Enable relay udp connectivity"
+  type        = string
+  default     = false
+}
+
 variable "secondary_dns" {
   description = "The relay cluster secondary dns, i.e 0.relay.obol.tech"
   type        = string
@@ -82,4 +88,10 @@ variable "cpu_requests" {
   description = "relay pod cpu requests"
   default     = "500m"
   type        = string
+}
+
+variable "wait_for_load_balancer" {
+  description = ""
+  default = "true"
+  type = string
 }

@@ -112,6 +112,11 @@ resource "kubernetes_stateful_set_v1" "relay" {
         node_selector = var.node_selector_enabled ? {
           node_pool = var.relay_name
         } : null
+        toleration {
+          effect = "NoSchedule"
+          key    = var.relay_name
+          value  = "true"
+        }
         automount_service_account_token = false
         enable_service_links            = false
       }
@@ -146,7 +151,7 @@ resource "kubernetes_service_v1" "relay-tcp" {
       "cloud.google.com/neg" = "{\"ingress\":true}"
     } : null
   }
-  wait_for_load_balancer = true
+  wait_for_load_balancer = var.wait_for_load_balancer
   spec {
     port {
       name        = "p2p-tcp"
@@ -169,6 +174,36 @@ resource "kubernetes_service_v1" "relay-tcp" {
     selector = {
       app = "${var.relay_name}-${count.index}"
     }
+    type                    = "LoadBalancer"
+    load_balancer_ip        = var.external_ips != null ? var.external_ips[count.index] : null
+    external_traffic_policy = "Local"
+  }
+}
+
+resource "kubernetes_service_v1" "relay-udp" {
+  count = var.udp_enabled ? var.cluster_size : 0
+  metadata {
+    name      = "${var.relay_name}-${count.index}-udp"
+    namespace = kubernetes_namespace_v1.relay.id
+    annotations = var.external_ips != null ? {
+      "cloud.google.com/neg" = "{\"ingress\":true}"
+    } : null
+  }
+
+  wait_for_load_balancer = false
+
+  spec {
+    port {
+      name        = "p2p-udp"
+      protocol    = "UDP"
+      port        = 3630
+      target_port = "3630"
+    }
+
+    selector = {
+      app = "${var.relay_name}-${count.index}"
+    }
+
     type                    = "LoadBalancer"
     load_balancer_ip        = var.external_ips != null ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
