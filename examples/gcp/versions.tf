@@ -29,9 +29,9 @@ terraform {
 }
 
 locals {
-  region           = "europe-west4"     // gke cluster region
-  project_id       = "prj-d-gke-a21f"   // gcp project id of the gke cluster
-  gke_cluster_name = "dev-europe-west4" // gke cluster name
+  region           = "europe-west4"  // gke cluster region
+  project_id       = "prj-relay"     // gcp project id of the gke cluster
+  gke_cluster_name = "gke-cluster-1" // gke cluster name
 }
 
 data "google_client_config" "default" {}

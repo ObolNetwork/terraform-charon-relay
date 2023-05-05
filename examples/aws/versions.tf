@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.4.0"
+  required_version = "~> 1.3.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -8,6 +8,10 @@ terraform {
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.14.0"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "= 1.14.0"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -20,24 +24,24 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-data "aws_eks_cluster" "cluster" {
-  name = "dev-cluster"
+data "aws_eks_cluster" "this" {
+  name = "eks-relay"
 }
 
 data "aws_eks_cluster_auth" "this" {
-  name = "dev-cluster"
+  name = "eks-relay"
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.data)
+  host                   = data.aws_eks_cluster.this.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.this.token
 }
 
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.data)
+    host                   = data.aws_eks_cluster.this.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.this.token
   }
 }
