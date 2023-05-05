@@ -1,3 +1,8 @@
+locals {
+  aws_lbs = [for svc in kubernetes_service_v1.relay-tcp : svc.status[0].load_balancer[0].ingress[0].hostname]
+  gcp_ips = var.external_ips != null ? var.external_ips : [for svc in kubernetes_service_v1.relay-tcp : svc.status[0].load_balancer[0].ingress[0].ip]
+}
+
 resource "kubernetes_namespace_v1" "relay" {
   metadata {
     name = var.relay_name
@@ -64,7 +69,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
         container {
           name        = "${var.relay_name}-${count.index}"
           image       = "ghcr.io/obolnetwork/charon:${var.relay_version}"
-          command     = var.external_ips != null ? ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-ip=${var.external_ips[count.index]}"] : ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-hostname=${kubernetes_service_v1.relay-tcp[count.index].status[0].load_balancer[0].ingress[0].hostname}"]
+          command     = lower(var.cloud_provider) == "gcp" ? ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-ip=${local.gcp_ips[count.index]}"] : ["sh", "-ace", "/usr/local/bin/charon relay --p2p-external-hostname=${local.aws_lbs[count.index]}"]
           working_dir = "/charon"
           env_from {
             config_map_ref {
@@ -147,7 +152,7 @@ resource "kubernetes_service_v1" "relay-tcp" {
   metadata {
     name      = "${var.relay_name}-${count.index}-tcp"
     namespace = kubernetes_namespace_v1.relay.id
-    annotations = var.external_ips != null ? {
+    annotations = lower(var.cloud_provider) == "gcp" ? {
       "cloud.google.com/neg" = "{\"ingress\":true}"
     } : null
   }
@@ -175,7 +180,7 @@ resource "kubernetes_service_v1" "relay-tcp" {
       app = "${var.relay_name}-${count.index}"
     }
     type                    = "LoadBalancer"
-    load_balancer_ip        = var.external_ips != null ? var.external_ips[count.index] : null
+    load_balancer_ip        = (lower(var.cloud_provider) == "gcp" && var.external_ips != null) ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
   }
 }
@@ -185,7 +190,7 @@ resource "kubernetes_service_v1" "relay-udp" {
   metadata {
     name      = "${var.relay_name}-${count.index}-udp"
     namespace = kubernetes_namespace_v1.relay.id
-    annotations = var.external_ips != null ? {
+    annotations = lower(var.cloud_provider) == "gcp" ? {
       "cloud.google.com/neg" = "{\"ingress\":true}"
     } : null
   }
@@ -205,7 +210,7 @@ resource "kubernetes_service_v1" "relay-udp" {
     }
 
     type                    = "LoadBalancer"
-    load_balancer_ip        = var.external_ips != null ? var.external_ips[count.index] : null
+    load_balancer_ip        = (lower(var.cloud_provider) == "gcp" && var.external_ips != null) ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
   }
 }
