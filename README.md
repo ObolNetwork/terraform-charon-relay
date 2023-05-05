@@ -1,22 +1,17 @@
-# Relay Deployment Guide
-This terraform module deploys a public relay cluster for the Obol DVT cluster
+# Charon Relay
+Terraform module to deploy a charon public relay.
 
 ## Deployment Architecture
-To deploy a DVT public relay, we use the following pieces of infrastracture:
-- HAProxy as reverse proxy in front of the charon relay nodes
-- The haproxy is assigned a static public IP
-- The harpoxy uses cluster-name in the request header as sticky session between the charon cluster and the corresponding relay node
-- 1 or more charon instances deployed in relay mode
-- Each instance is assigned a public static IP
+This module deploys the following infrastructure:
+- HAProxy (reverse proxy) in front of the charon relay nodes
+- The harpoxy uses the `cluster-name` to establish a sticky session between the charon cluster nodes and the relay server
+- One or more charon instances started in relay mode and deployed as Kubernetes statefulsets.
 
-## Requirements
-- Terraform v0.12.x or higher
+## Prerequisites
+- Terraform v1.3 or higher
 - A valid domain name (i.e obol.tech)
-- An operational Kubernetes cluster. This module is tested with both GKE and EKS
+- An operational Kubernetes cluster (GKE and EKS are only supported)
 - Kubernetes add-ons: nginx-ingress, external-dns, and cert-manager.
 
-## Usage with GCP
-Please refer to examples/gcp
-
-## Usage with AWS
-Please refer to examples/aws
+## How to use
+Please refer to the examples directory for AWS and GCP use cases.

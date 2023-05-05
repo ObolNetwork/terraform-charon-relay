@@ -6,7 +6,6 @@ variable "relay_name" {
 variable "cluster_size" {
   description = "The number of the nodes in a relay cluster"
   type        = string
-  default     = "1"
 }
 
 variable "relay_version" {
@@ -14,31 +13,36 @@ variable "relay_version" {
   type        = string
 }
 
-variable "external_ips" {
-  description = "List of public static IPs created in GCP only"
-  type        = list(string)
-  default     = null
-}
-
-variable "base_dns" {
-  description = "obol base domain name"
-  type        = string
-}
-
 variable "udp_enabled" {
-  description = "Enable relay udp connectivity"
+  description = "Enable relay udp connectivity. (Deprecated)"
   type        = string
   default     = false
 }
 
-variable "secondary_dns" {
-  description = "The relay cluster secondary dns, i.e 0.relay.obol.tech"
+variable "cloud_provider" {
+  description = "Cloud provider name. The module supports aws and gcp."
+  type        = string
+}
+
+variable "external_ips" {
+  description = "(Optional) List of public static IPs. Only Supported by GCP. (Deprecated)"
+  type        = list(string)
+  default     = null
+}
+
+variable "primary_base_domain" {
+  description = "The primary base domain name to create relay subdomain. obol.tech -> relay-0.obol.tech"
+  type        = string
+}
+
+variable "secondary_base_domain" {
+  description = "(Optional) The secondary base domain name to create relay subdomain. obol.dev -> relay-0.obol.dev"
   type        = string
   default     = ""
 }
 
 variable "loki_endpoint" {
-  description = "The loki endpoint to push logs to it."
+  description = "(Optional) The loki endpoint to push logs to it."
   type        = string
   default     = ""
 }
@@ -48,6 +52,7 @@ variable "haproxy_chart_version" {
   type        = string
   default     = "0.6.11"
 }
+
 variable "haproxy_replicas_count" {
   description = "The number of haproxy replicas"
   type        = string
@@ -61,37 +66,37 @@ variable "node_selector_enabled" {
 }
 
 variable "storageclass" {
-  description = "k8s pv storage class (standard, gp2, etc)"
+  description = "Kubernetes storage class (standard, gp2, etc)"
   type        = string
   default     = "standard"
 }
 
 variable "memory_limits" {
-  description = "relay pod memory limits"
-  default     = "1Gi"
+  description = "Relay pod memory limits"
   type        = string
+  default     = "1Gi"
 }
 
 variable "memory_requests" {
-  description = "relay pod memory requests"
-  default     = "1Gi"
+  description = "Relay pod memory requests"
   type        = string
+  default     = "1Gi"
 }
 
 variable "cpu_limits" {
-  description = "relay pod cpu limits"
-  default     = null
+  description = "Relay pod cpu limits"
   type        = string
+  default     = null
 }
 
 variable "cpu_requests" {
-  description = "relay pod cpu requests"
-  default     = "500m"
+  description = "Relay pod cpu requests"
   type        = string
+  default     = "500m"
 }
 
 variable "wait_for_load_balancer" {
-  description = ""
-  default     = "true"
+  description = "Wait until the load balancer is created"
   type        = string
+  default     = "true"
 }
