@@ -4,7 +4,7 @@ Terraform module to deploy a charon public relay.
 ## Deployment Architecture
 This module deploys the following infrastructure:
 - HAProxy (reverse proxy) in front of the charon relay nodes
-- The harpoxy uses the `cluster-name` to establish a sticky session between the charon cluster nodes and the relay server
+- The haproxy uses the `cluster-name` to establish a sticky session between the charon cluster nodes and the relay server
 - One or more charon instances started in relay mode and deployed as Kubernetes statefulsets.
 
 ## Prerequisites
