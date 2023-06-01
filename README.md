@@ -8,7 +8,7 @@ Terraform module to deploy a charon public relay.
 
 ## Deployment Architecture
 - HAProxy, to establish a header-base sticky session between the charon DV nodes and the relay server
-- Charon nodes run in relay mode and deployed as statefulsets
+- Charon nodes, running in relay mode and deployed as statefulsets
 
 ## How to use
 - [`Module configuration`](MODULE.md)
