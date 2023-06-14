@@ -112,19 +112,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
           image_pull_policy = "Always"
         }
 
-        affinity {
-          node_affinity {
-            required_during_scheduling_ignored_during_execution {
-              node_selector_term {
-                match_expressions {
-                  key      = "failure-domain.beta.kubernetes.io/zone"
-                  operator = "In"
-                  values   = ["eu-west-1b", "eu-west-1c"] 
-                }
-              }
-            }
-          }
-        }
+  
         security_context {
           run_as_user = 0
         }
