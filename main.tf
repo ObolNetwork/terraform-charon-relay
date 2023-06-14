@@ -111,6 +111,24 @@ resource "kubernetes_stateful_set_v1" "relay" {
           }
           image_pull_policy = "Always"
         }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["my-app"]
+                }
+              }
+
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+        }
+      }
+    }
         security_context {
           run_as_user = 0
         }
