@@ -119,7 +119,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
                 match_expressions {
                   key      = "failure-domain.beta.kubernetes.io/zone"
                   operator = "In"
-                  values   = ["eu-west-1b", "eu-west-1c"] 
+                  values   = var.zones
                 }
               }
             }

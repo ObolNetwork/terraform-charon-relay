@@ -100,3 +100,9 @@ variable "wait_for_load_balancer" {
   type        = string
   default     = "true"
 }
+
+variable "zones" {
+  description = "The list of the zones to deploy the relay cluster"
+  type        = list(string)
+  default     = ["eu-west-1b", "eu-west-1c"]
+}
