@@ -117,7 +117,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
             required_during_scheduling_ignored_during_execution {
               node_selector_term {
                 match_expressions {
-                  key      = "failure-domain.beta.kubernetes.io/zone"
+                  key      = "topology.kubernetes.io/zone"
                   operator = "In"
                   values   = var.zones
                 }
