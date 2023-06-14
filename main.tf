@@ -119,7 +119,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
                 match_expressions {
                   key      = "failure-domain.beta.kubernetes.io/zone"
                   operator = "In"
-                  values   = ["us-west-2a", "us-west-2b"] # Replace with your desired zones
+                  values   = ["eu-west-1b", "eu-west-1c"] 
                 }
               }
             }
