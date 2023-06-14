@@ -113,22 +113,18 @@ resource "kubernetes_stateful_set_v1" "relay" {
         }
 
         affinity {
-          pod_anti_affinity {
+          node_affinity {
             required_during_scheduling_ignored_during_execution {
-              label_selector {
+              node_selector_term {
                 match_expressions {
-                  key      = "app"
+                  key      = "failure-domain.beta.kubernetes.io/zone"
                   operator = "In"
-                  values   = ["my-app"]
+                  values   = ["us-west-2a", "us-west-2b"] # Replace with your desired zones
                 }
               }
-
-              topology_key = "kubernetes.io/hostname"
             }
           }
         }
-      }
-    }
         security_context {
           run_as_user = 0
         }
