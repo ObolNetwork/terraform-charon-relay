@@ -119,10 +119,6 @@ resource "kubernetes_stateful_set_v1" "relay" {
             node_affinity = var.node_affinity_config
           }
         }
-
-
-
-
         security_context {
           run_as_user = 0
         }
