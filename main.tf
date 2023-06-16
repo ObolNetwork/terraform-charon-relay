@@ -120,9 +120,6 @@ resource "kubernetes_stateful_set_v1" "relay" {
             }
           }
         }
-
-
-
         security_context {
           run_as_user = 0
         }
