@@ -100,3 +100,9 @@ variable "wait_for_load_balancer" {
   type        = string
   default     = "true"
 }
+
+variable "node_affinity_config" {
+  description = "Node Affinity configuration"
+  type        = map(any)
+  default     = {}
+}
