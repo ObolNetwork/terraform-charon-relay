@@ -104,5 +104,16 @@ variable "wait_for_load_balancer" {
 variable "node_affinity_config" {
   description = "Node Affinity configuration"
   type        = map(any)
-  default     = {}
+  default     = {
+    required_during_scheduling_ignored_during_execution {
+    node_selector_term {
+      match_expressions {
+        key      = "topology.kubernetes.io/zone"
+        operator = "In"
+        values   =  ["eu-west-1b", "eu-west-1c"]
+      }
+    }
+  }
+  }
 }
+
