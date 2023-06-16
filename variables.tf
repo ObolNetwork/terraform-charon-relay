@@ -106,3 +106,9 @@ variable "zones" {
   type        = list(string)
   default     = ["eu-west-1b", "eu-west-1c"]
 }
+
+variable "node_affinity_config" {
+  description = "Node Affinity configuration"
+  type        = map(any)
+  default     = {}
+}

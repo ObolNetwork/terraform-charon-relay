@@ -112,17 +112,10 @@ resource "kubernetes_stateful_set_v1" "relay" {
           image_pull_policy = "Always"
         }
 
-        affinity {
-          node_affinity {
-            required_during_scheduling_ignored_during_execution {
-              node_selector_term {
-                match_expressions {
-                  key      = "topology.kubernetes.io/zone"
-                  operator = "In"
-                  values   = var.zones
-                }
-              }
-            }
+        dynamic "affinity" {
+          for_each = var.node_affinity_config != {} ? [1] : []
+          content {
+            node_affinity = var.node_affinity_config
           }
         }
         security_context {
