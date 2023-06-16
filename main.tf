@@ -114,17 +114,25 @@ resource "kubernetes_stateful_set_v1" "relay" {
 
 
         dynamic "affinity" {
-          for_each = length(var.node_affinity_config) > 0 ? [var.node_affinity_config] : []
+          for_each = var.node_affinity_config != {} ? [1] : []
           content {
             node_affinity {
-               required_during_scheduling_ignored_during_execution {
-                node_selector_term {
-                  match_expressions = affinity.value.match_expressions
+              required_during_scheduling_ignored_during_execution {
+                dynamic "node_selector_term" {
+                  for_each = affinity.value.match_expressions
+                  content {
+                    match_expressions {
+                      key      = node_selector_term.value.key
+                      operator = node_selector_term.value.operator
+                      values   = node_selector_term.value.values
+                    }
+                  }
                 }
               }
             }
           }
         }
+
         security_context {
           run_as_user = 0
         }
