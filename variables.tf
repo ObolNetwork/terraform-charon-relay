@@ -102,7 +102,14 @@ variable "wait_for_load_balancer" {
 }
 
 variable "node_affinity_config" {
-  description = "Node Affinity configuration"
-  type = map(any)
-  default     = {}
+  description = "Configuration for node affinity"
+  type = list(object({
+    match_expressions = list(object({
+      key      = string
+      operator = string
+      values   = list(string)
+    }))
+  }))
+  default = []
 }
+
