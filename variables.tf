@@ -102,7 +102,19 @@ variable "wait_for_load_balancer" {
 }
 
 variable "node_affinity_config" {
-  description = "Node Affinity configuration"
-  type        = map(any)
-  default     = {}
+  description = "Deployment pod affinity configuration"
+  type = list(object({
+    type         = string
+    weight       = number
+    topology_key = string
+    label_selectors = list(object({
+      match_expressions = list(object({
+        key      = string
+        operator = string
+        values   = list(string)
+      }))
+    }))
+  }))
+  default = []
 }
+

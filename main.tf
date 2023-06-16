@@ -1,6 +1,12 @@
 locals {
   aws_lbs = [for svc in kubernetes_service_v1.relay-tcp : svc.status[0].load_balancer[0].ingress[0].hostname]
   gcp_ips = var.external_ips != null ? var.external_ips : [for svc in kubernetes_service_v1.relay-tcp : svc.status[0].load_balancer[0].ingress[0].ip]
+  commonLabels = {
+    "app.kubernetes.io/app" = var.relay_name
+  }
+  selectorLabels = {
+    "app.kubernetes.io/app" = var.relay_name
+  }
 }
 
 resource "kubernetes_namespace_v1" "relay" {
@@ -113,13 +119,57 @@ resource "kubernetes_stateful_set_v1" "relay" {
         }
 
         affinity {
-          dynamic "node_affinity_config" {
-            for_each = var.node_affinity_config != {} ? [1] : []
+          dynamic "pod_affinity" {
+            for_each = try(var.node_affinity_config, [])
             content {
-              node_affinity = var.node_affinity_config
+              dynamic "preferred_during_scheduling_ignored_during_execution" {
+                for_each = pod_affinity.value.type == "preferred_during_scheduling_ignored_during_execution" ? [1] : []
+                content {
+                  weight = pod_affinity.value.weight
+                  pod_affinity_term {
+                    topology_key = pod_affinity.value.topology_key
+                    dynamic "label_selector" {
+                      for_each = pod_affinity.value.label_selectors
+                      content {
+                        match_labels = try(label_selector.value.match_expressions, null) == null ? local.commonLabels : null
+                        dynamic "match_expressions" {
+                          for_each = label_selector.value.match_expressions == null ? [] : label_selector.value.match_expressions
+                          content {
+                            key      = match_expressions.value.key
+                            operator = match_expressions.value.operator
+                            values   = match_expressions.value.values
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              dynamic "required_during_scheduling_ignored_during_execution" {
+                for_each = pod_affinity.value.type == "required_during_scheduling_ignored_during_execution" ? [1] : []
+                content {
+                  topology_key = pod_affinity.value.topology_key
+                  dynamic "label_selector" {
+                    for_each = pod_affinity.value.label_selectors
+                    content {
+                      match_labels = try(label_selector.value.match_expressions, null) == null ? local.commonLabels : null
+                      dynamic "match_expressions" {
+                        for_each = label_selector.value.match_expressions == null ? [] : label_selector.value.match_expressions
+                        content {
+                          key      = match_expressions.value.key
+                          operator = match_expressions.value.operator
+                          values   = match_expressions.value.values
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
+
         security_context {
           run_as_user = 0
         }
