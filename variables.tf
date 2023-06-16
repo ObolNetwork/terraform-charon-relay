@@ -101,12 +101,6 @@ variable "wait_for_load_balancer" {
   default     = "true"
 }
 
-variable "zones" {
-  description = "The list of the zones to deploy the relay cluster"
-  type        = list(string)
-  default     = ["eu-west-1b", "eu-west-1c"]
-}
-
 variable "node_affinity_config" {
   description = "Node Affinity configuration"
   type        = map(any)
