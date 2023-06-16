@@ -113,7 +113,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
         }
 
 
-        dynamic "node_affinity_config" {
+        dynamic "affinity" {
           for_each = var.node_affinity_config != {} ? [1] : []
           content {
             node_affinity = var.node_affinity_config
