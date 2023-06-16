@@ -112,14 +112,14 @@ resource "kubernetes_stateful_set_v1" "relay" {
           image_pull_policy = "Always"
         }
 
-        affinity {
-          dynamic "node_affinity_config" {
-            for_each = var.node_affinity_config != {} ? [1] : []
-            content {
-              node_affinity = var.node_affinity_config
-            }
+
+        dynamic "node_affinity_config" {
+          for_each = var.node_affinity_config != {} ? [1] : []
+          content {
+            node_affinity = var.node_affinity_config
           }
         }
+
 
 
 
