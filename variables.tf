@@ -115,6 +115,13 @@ variable "node_affinity_config" {
       }))
     }))
   }))
-  default = []
+  default = [{
+    type         = "preferred_during_scheduling_ignored_during_execution"
+    weight       = 100
+    topology_key = "topology.kubernetes.io/zone"
+    label_selectors = [{
+      match_expressions = null
+    }]
+  }]
 }
 
