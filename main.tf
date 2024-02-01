@@ -40,7 +40,7 @@ resource "kubernetes_pod_disruption_budget_v1" "relay" {
     namespace = kubernetes_namespace_v1.relay.id
   }
   spec {
-    max_unavailable = "1"
+    max_unavailable = var.max_unavailable
     selector {
       match_labels = {
         app = "${var.relay_name}-${count.index}"

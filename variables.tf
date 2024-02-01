@@ -125,3 +125,8 @@ variable "node_affinity_config" {
   }]
 }
 
+variable "max_unavailable" {
+  description = "value for PDB maxUnavailable"
+  type        = string
+  default     = "1"
+}
