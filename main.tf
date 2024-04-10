@@ -174,11 +174,11 @@ resource "kubernetes_stateful_set_v1" "relay" {
           run_as_user = 0
         }
         node_selector = var.node_selector_enabled ? {
-          node_pool = var.relay_name
+          node_pool = var.node_selector
         } : null
         toleration {
           effect = "NoSchedule"
-          key    = var.relay_name
+          key    = var.node_selector
           value  = "true"
         }
         automount_service_account_token = false
