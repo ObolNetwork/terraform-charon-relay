@@ -65,6 +65,12 @@ variable "node_selector_enabled" {
   default     = false
 }
 
+variable "node_selector" {
+  description = "Node selector"
+  type        = string
+  default     = null
+}
+
 variable "storageclass" {
   description = "Kubernetes storage class (standard, gp2, etc)"
   type        = string
@@ -74,13 +80,13 @@ variable "storageclass" {
 variable "memory_limits" {
   description = "Relay pod memory limits"
   type        = string
-  default     = "1Gi"
+  default     = null
 }
 
 variable "memory_requests" {
   description = "Relay pod memory requests"
   type        = string
-  default     = "1Gi"
+  default     = "500Mi"
 }
 
 variable "cpu_limits" {
