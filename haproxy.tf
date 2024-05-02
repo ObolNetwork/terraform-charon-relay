@@ -75,6 +75,14 @@ ingress:
     nginx.ingress.kubernetes.io/app-root: /enr
     cert-manager.io/issue-temporary-certificate: "true"
     acme.cert-manager.io/http01-edit-in-place: "true"
+    nginx.org/server-snippets: |
+      location ~* ^/(?!enr$|enr/|$) {
+        return 403;
+      }
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* ^/(?!enr$|enr/|$) {
+        return 403;
+      }
   tls: true
   ingressClassName: nginx
 EOF
@@ -106,6 +114,16 @@ resource "kubernetes_ingress_v1" "secondary-domain" {
       "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
       "cert-manager.io/issue-temporary-certificate"    = "true"
       "acme.cert-manager.io/http01-edit-in-place"      = "true"
+      "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOT
+      location ~* ^/(?!enr$|enr/|$) {
+        return 403;
+      }
+      EOT
+      "nginx.org/server-snippets" = <<-EOT
+      location ~* ^/(?!enr$|enr/|$) {
+        return 403;
+      }
+      EOT
     }
   }
 
