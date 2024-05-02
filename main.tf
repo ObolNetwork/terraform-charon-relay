@@ -4,9 +4,6 @@ locals {
   commonLabels = {
     "app.kubernetes.io/app" = var.relay_name
   }
-  selectorLabels = {
-    "app.kubernetes.io/app" = var.relay_name
-  }
 }
 
 resource "kubernetes_namespace_v1" "relay" {

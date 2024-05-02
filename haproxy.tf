@@ -109,17 +109,17 @@ resource "kubernetes_ingress_v1" "secondary-domain" {
     }
 
     annotations = {
-      "cert-manager.io/cluster-issuer"                 = "letsencrypt"
-      "nginx.ingress.kubernetes.io/app-root"           = "/enr"
-      "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
-      "cert-manager.io/issue-temporary-certificate"    = "true"
-      "acme.cert-manager.io/http01-edit-in-place"      = "true"
+      "cert-manager.io/cluster-issuer"                    = "letsencrypt"
+      "nginx.ingress.kubernetes.io/app-root"              = "/enr"
+      "nginx.ingress.kubernetes.io/force-ssl-redirect"    = "true"
+      "cert-manager.io/issue-temporary-certificate"       = "true"
+      "acme.cert-manager.io/http01-edit-in-place"         = "true"
       "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOT
       location ~* ^/(?!enr$|enr/|$) {
         return 403;
       }
       EOT
-      "nginx.org/server-snippets" = <<-EOT
+      "nginx.org/server-snippets"                         = <<-EOT
       location ~* ^/(?!enr$|enr/|$) {
         return 403;
       }
