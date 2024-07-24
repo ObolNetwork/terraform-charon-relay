@@ -27,7 +27,7 @@ resource "kubernetes_config_map_v1" "haproxy" {
   data = {
     "haproxy.cfg" = <<EOF
 global
-  log stdout format raw local0
+  log stdout format rfc3164 local0
   maxconn 1024
 defaults
   log global
