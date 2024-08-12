@@ -48,6 +48,30 @@ ${local.servers_config}
 locals {
   servers_config = trim(join("", formatlist("%s \n", null_resource.backend_servers[*].triggers.server)), ",")
 
+  cert_manager_annotations = var.auto_create_tls ? [
+    "cert-manager.io/cluster-issuer: \"letsencrypt\"",
+    "cert-manager.io/issue-temporary-certificate: \"true\"",
+    "acme.cert-manager.io/http01-edit-in-place: \"true\""
+  ] : []
+  cert_manager_annotations_yaml = join("\n", local.cert_manager_annotations)
+
+  tls_yaml = join("", [
+    for domain in concat(var.extra_domains) : <<EOT
+  - hosts:
+    - ${domain}
+    secretName: ${replace(domain, ".", "-")}-tls
+EOT
+  ])
+
+  extra_domains_yaml = length(var.extra_domains) > 0 ? join("", [
+    for host in var.extra_domains : <<EOT
+    - name: "${host}"
+      path: /
+EOT
+  ]) : ""
+
+  dns_annotations_yaml = var.auto_create_dns ? "" : "external-dns.alpha.kubernetes.io/hostname: \"\""
+
   values = [
     <<EOF
 ---
@@ -68,23 +92,17 @@ containerPorts:
 existingConfigmap: haproxy
 ingress:
   enabled: true
+  ingressClassName: nginx
   hostname: ${var.relay_name}.${var.primary_base_domain}
   annotations:
+    ${indent(4, local.cert_manager_annotations_yaml)}
+    ${indent(4, local.dns_annotations_yaml)}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt"
-    nginx.ingress.kubernetes.io/app-root: /enr
-    cert-manager.io/issue-temporary-certificate: "true"
-    acme.cert-manager.io/http01-edit-in-place: "true"
-    nginx.org/server-snippets: |
-      location ~* ^/(?!enr$|enr/|$) {
-        return 403;
-      }
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location ~* ^/(?!enr$|enr/|$) {
-        return 403;
-      }
+${length(var.extra_domains) > 0 ? "  extraHosts:" : ""}
+${local.extra_domains_yaml}
   tls: true
-  ingressClassName: nginx
+${length(var.extra_domains) > 0 ? "  extraTls:" : ""}
+${local.tls_yaml}
 EOF
   ]
 }
@@ -93,67 +111,5 @@ resource "null_resource" "backend_servers" {
   count = var.cluster_size
   triggers = {
     server = lower(var.cloud_provider) == "gcp" ? "  server ${var.relay_name}-${count.index} ${local.gcp_ips[count.index]}:3640 check  inter 10s  fall 12  rise 2" : "  server ${var.relay_name}-${count.index} ${local.aws_lbs[count.index]}:3640 check  inter 10s  fall 12  rise 2"
-  }
-}
-
-# an ingress to handle traffic from the secondary relay domain
-resource "kubernetes_ingress_v1" "secondary-domain" {
-  count = var.secondary_base_domain != "" ? 1 : 0
-  metadata {
-    name      = "secondary-domain"
-    namespace = var.relay_name
-
-    labels = {
-      "app.kubernetes.io/instance" = "secondary-domain"
-      "app.kubernetes.io/name"     = "secondary-domain"
-    }
-
-    annotations = {
-      "cert-manager.io/cluster-issuer"                    = "letsencrypt"
-      "nginx.ingress.kubernetes.io/app-root"              = "/enr"
-      "nginx.ingress.kubernetes.io/force-ssl-redirect"    = "true"
-      "cert-manager.io/issue-temporary-certificate"       = "true"
-      "acme.cert-manager.io/http01-edit-in-place"         = "true"
-      "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOT
-      location ~* ^/(?!enr$|enr/|$) {
-        return 403;
-      }
-      EOT
-      "nginx.org/server-snippets"                         = <<-EOT
-      location ~* ^/(?!enr$|enr/|$) {
-        return 403;
-      }
-      EOT
-    }
-  }
-
-  spec {
-    ingress_class_name = "nginx"
-
-    tls {
-      hosts       = [var.secondary_base_domain]
-      secret_name = "${var.secondary_base_domain}-tls"
-    }
-
-    rule {
-      host = var.secondary_base_domain
-
-      http {
-        path {
-          path      = "/"
-          path_type = "ImplementationSpecific"
-
-          backend {
-            service {
-              name = "haproxy"
-
-              port {
-                name = "http"
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
