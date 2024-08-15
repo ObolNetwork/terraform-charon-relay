@@ -35,10 +35,10 @@ variable "primary_base_domain" {
   type        = string
 }
 
-variable "secondary_base_domain" {
-  description = "(Optional) The secondary base domain name to create relay subdomain. obol.dev -> relay-0.obol.dev"
-  type        = string
-  default     = ""
+variable "extra_domains" {
+  description = "List of extra domains"
+  type        = list(string)
+  default     = []
 }
 
 variable "loki_endpoint" {
@@ -135,4 +135,16 @@ variable "max_unavailable" {
   description = "value for PDB maxUnavailable"
   type        = string
   default     = "1"
+}
+
+variable "auto_create_tls" {
+  description = "Flag to enable cert-manager annotations to auto generate tls certificates"
+  type        = bool
+  default     = true
+}
+
+variable "auto_create_dns" {
+  description = "Flag to enable external-dns annotations to auto generate dns records"
+  type        = bool
+  default     = true
 }
