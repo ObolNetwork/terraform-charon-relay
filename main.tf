@@ -170,14 +170,20 @@ resource "kubernetes_stateful_set_v1" "relay" {
         security_context {
           run_as_user = 0
         }
-        node_selector = var.node_selector_enabled ? {
+        node_selector = (var.node_selector_enabled && var.node_selector != "") ? {
           node_pool = var.node_selector
         } : null
-        toleration {
-          effect = "NoSchedule"
-          key    = var.node_selector
-          value  = "true"
+
+        dynamic "toleration" {
+          for_each = (var.node_selector_enabled && var.node_selector != "")  ? [1] : []
+          content {
+            effect   = "NoSchedule"
+            key      = var.node_selector
+            operator = "Equal"
+            value    = "true"
+          }
         }
+
         automount_service_account_token = false
         enable_service_links            = false
       }
