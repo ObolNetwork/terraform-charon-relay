@@ -175,7 +175,7 @@ resource "kubernetes_stateful_set_v1" "relay" {
         } : null
 
         dynamic "toleration" {
-          for_each = (var.node_selector_enabled && var.node_selector != "")  ? [1] : []
+          for_each = (var.node_selector_enabled && var.node_selector != "") ? [1] : []
           content {
             effect   = "NoSchedule"
             key      = var.node_selector
