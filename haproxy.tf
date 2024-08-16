@@ -72,6 +72,16 @@ EOT
 
   dns_annotations_yaml = var.auto_create_dns ? "" : "external-dns.alpha.kubernetes.io/hostname: \"\""
 
+  node_selector_yaml = (var.node_selector_enabled && var.node_selector != "") ? join("\n", [
+    "nodeSelector:",
+    "  \"node_pool\": \"${var.node_selector}\"",
+    "tolerations:",
+    "  - key: \"${var.node_selector}\"",
+    "    operator: \"Equal\"",
+    "    value: \"true\"",
+    "    effect: \"NoSchedule\""
+  ]) : ""
+
   values = [
     <<EOF
 ---
@@ -103,6 +113,7 @@ ${local.extra_domains_yaml}
   tls: true
 ${length(var.extra_domains) > 0 ? "  extraTls:" : ""}
 ${local.tls_yaml}
+${local.node_selector_yaml}
 EOF
   ]
 }
