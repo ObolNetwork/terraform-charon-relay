@@ -72,7 +72,7 @@ EOT
 
   dns_annotations_yaml = var.auto_create_dns ? "" : "external-dns.alpha.kubernetes.io/hostname: \"\""
 
-  node_selector_yaml = (var.node_selector_enabled  && var.node_selector != "") ? join("\n", [
+  node_selector_yaml = (var.node_selector_enabled && var.node_selector != "") ? join("\n", [
     "nodeSelector:",
     "  \"node_pool\": \"${var.node_selector}\"",
     "tolerations:",
