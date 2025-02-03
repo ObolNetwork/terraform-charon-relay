@@ -40,6 +40,7 @@ frontend fe_main
 backend relays
   mode http
   balance hdr(Charon-Cluster)
+  option httpchk GET /
 ${local.servers_config}
     EOF
   }
