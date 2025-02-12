@@ -34,6 +34,13 @@ defaults
   timeout client 60s
   timeout connect 60s
   timeout server 60s
+listen stats
+  bind :8404
+  mode http
+  stats enable
+  stats uri /stats
+  stats refresh 10s
+  stats admin if LOCALHOST
 frontend fe_main
   bind :8080
   default_backend relays
@@ -100,6 +107,8 @@ containerPorts:
     containerPort: 8080
   - name: bootnode-http
     containerPort: 3640
+  - name: stats
+    containerPort: 8404
 existingConfigmap: haproxy
 ingress:
   enabled: true
