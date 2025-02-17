@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "custom.regex",
+    "github-actions"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "matchStrings": [
+        "variable\\s+\"haproxy_chart_version\"\\s*{[^}]*default\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "fileMatch": [
+        "^variables\\.tf$"
+      ],
+      "datasourceTemplate": "helm",
+      "depNameTemplate": "haproxy",
+      "registryUrlTemplate": "https://charts.bitnami.com/bitnami"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "schedule": [
+        "every weekend"
+      ],
+      "labels": [
+        "renovate/terraform"
+      ]
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepTypes": [
+        "github-actions"
+      ],
+      "matchFileNames": [
+        ".github/workflows/**"
+      ],
+      "schedule": [
+        "every weekend"
+      ],
+      "labels": [
+        "renovate/github-actions"
+      ],
+      "groupName": "GitHub Actions updates"
+    }
+  ]
+}
