@@ -1,6 +1,6 @@
 resource "helm_release" "haproxy" {
   name       = "haproxy"
-  repository = "https://charts.bitnami.com/bitnami"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "haproxy"
   version    = var.haproxy_chart_version
   namespace  = var.relay_name
