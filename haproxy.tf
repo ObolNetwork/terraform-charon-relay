@@ -93,6 +93,9 @@ EOT
   values = [
     <<EOF
 ---
+image:
+  registry: docker.io
+  repository: bitnamilegacy/haproxy
 service:
   ports:
     - name: http
