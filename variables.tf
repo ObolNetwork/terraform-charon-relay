@@ -50,7 +50,7 @@ variable "loki_endpoint" {
 variable "haproxy_chart_version" {
   description = "Haproxy helm chart version"
   type        = string
-  default     = "2.2.17"
+  default     = "3.3.1"
 }
 
 variable "haproxy_replicas_count" {
