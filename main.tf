@@ -115,6 +115,18 @@ resource "kubernetes_stateful_set_v1" "relay" {
           image_pull_policy = "Always"
         }
 
+        dynamic "topology_spread_constraint" {
+          for_each = var.topology_spread_enabled ? [1] : []
+          content {
+            max_skew           = 1
+            topology_key       = "kubernetes.io/hostname"
+            when_unsatisfiable = "ScheduleAnyway"
+            label_selector {
+              match_labels = local.commonLabels
+            }
+          }
+        }
+
         affinity {
           dynamic "pod_affinity" {
             for_each = try(var.node_affinity_config, [])
