@@ -80,6 +80,16 @@ EOT
 
   dns_annotations_yaml = var.auto_create_dns ? "" : "external-dns.alpha.kubernetes.io/hostname: \"\""
 
+  topology_spread_yaml = var.topology_spread_enabled ? join("\n", [
+    "topologySpreadConstraints:",
+    "  - maxSkew: 1",
+    "    topologyKey: kubernetes.io/hostname",
+    "    whenUnsatisfiable: ScheduleAnyway",
+    "    labelSelector:",
+    "      matchLabels:",
+    "        app.kubernetes.io/name: haproxy"
+  ]) : ""
+
   node_selector_yaml = (var.node_selector_enabled && var.node_selector != "") ? join("\n", [
     "nodeSelector:",
     "  \"node_pool\": \"${var.node_selector}\"",
@@ -127,6 +137,7 @@ ${local.extra_domains_yaml}
 ${length(var.extra_domains) > 0 ? "  extraTls:" : ""}
 ${local.tls_yaml}
 ${local.node_selector_yaml}
+${local.topology_spread_yaml}
 EOF
   ]
 }

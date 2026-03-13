@@ -137,6 +137,12 @@ variable "max_unavailable" {
   default     = "1"
 }
 
+variable "topology_spread_enabled" {
+  description = "Enable topology spread constraints to distribute pods evenly across nodes"
+  type        = bool
+  default     = true
+}
+
 variable "auto_create_tls" {
   description = "Flag to enable cert-manager annotations to auto generate tls certificates"
   type        = bool
