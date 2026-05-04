@@ -9,6 +9,6 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # main
+      uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231 # main
     - name: Lint Terraform
       uses: actionshub/terraform-lint@9e854ecdc0cedda954adfffccced9f71dc12fda0 # main
