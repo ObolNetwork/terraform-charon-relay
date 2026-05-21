@@ -269,6 +269,8 @@ resource "kubernetes_service_v1" "relay-udp" {
     namespace = kubernetes_namespace_v1.relay.id
     annotations = lower(var.cloud_provider) == "gcp" ? {
       "cloud.google.com/neg" = "{\"ingress\":true}"
+      } : lower(var.cloud_provider) == "aws" ? {
+      "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
     } : null
   }
 
