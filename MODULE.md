@@ -52,7 +52,7 @@ No modules.
 | <a name="input_relay_version"></a> [relay\_version](#input\_relay\_version) | Charon image tag to use to deploy the relay statefulset | `string` | n/a | yes |
 | <a name="input_secondary_base_domain"></a> [secondary\_base\_domain](#input\_secondary\_base\_domain) | (Optional) The secondary base domain name to create relay subdomain. obol.dev -> relay-0.obol.dev | `string` | `""` | no |
 | <a name="input_storageclass"></a> [storageclass](#input\_storageclass) | Kubernetes storage class (standard, gp2, etc) | `string` | `"standard"` | no |
-| <a name="input_udp_enabled"></a> [udp\_enabled](#input\_udp\_enabled) | Enable relay udp connectivity. (Deprecated) | `string` | `false` | no |
+| <a name="input_udp_enabled"></a> [udp\_enabled](#input\_udp\_enabled) | Enable QUIC/UDP connectivity. Sets CHARON\_P2P\_UDP\_ADDRESS and creates a UDP LoadBalancer service on port 3630. | `bool` | `false` | no |
 | <a name="input_wait_for_load_balancer"></a> [wait\_for\_load\_balancer](#input\_wait\_for\_load\_balancer) | Wait until the load balancer is created | `string` | `"true"` | no |
 
 ## Outputs

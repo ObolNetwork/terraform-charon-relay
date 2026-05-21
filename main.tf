@@ -18,16 +18,19 @@ resource "kubernetes_config_map_v1" "relay" {
     name      = "${var.relay_name}-${count.index}"
     namespace = kubernetes_namespace_v1.relay.id
   }
-  data = {
-    CHARON_HTTP_ADDRESS       = "0.0.0.0:3640"
-    CHARON_P2P_TCP_ADDRESS    = "0.0.0.0:3610"
-    CHARON_MONITORING_ADDRESS = "0.0.0.0:3620"
-    CHARON_LOG_FORMAT         = "json"
-    CHARON_LOG_LEVEL          = "debug"
-    CHARON_P2P_RELAY_LOGLEVEL = "debug"
-    CHARON_LOKI_ADDRESSES     = var.loki_endpoint
-    CHARON_LOKI_SERVICE       = var.relay_name
-  }
+  data = merge(
+    {
+      CHARON_HTTP_ADDRESS       = "0.0.0.0:3640"
+      CHARON_P2P_TCP_ADDRESS    = "0.0.0.0:3610"
+      CHARON_MONITORING_ADDRESS = "0.0.0.0:3620"
+      CHARON_LOG_FORMAT         = "json"
+      CHARON_LOG_LEVEL          = "debug"
+      CHARON_P2P_RELAY_LOGLEVEL = "debug"
+      CHARON_LOKI_ADDRESSES     = var.loki_endpoint
+      CHARON_LOKI_SERVICE       = var.relay_name
+    },
+    var.udp_enabled ? { CHARON_P2P_UDP_ADDRESS = "0.0.0.0:3630" } : {}
+  )
 }
 
 resource "kubernetes_pod_disruption_budget_v1" "relay" {
