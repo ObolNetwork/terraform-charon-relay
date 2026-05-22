@@ -14,8 +14,8 @@ variable "relay_version" {
 }
 
 variable "udp_enabled" {
-  description = "Enable relay udp connectivity. (Deprecated)"
-  type        = string
+  description = "Enable QUIC/UDP connectivity. Sets CHARON_P2P_UDP_ADDRESS and creates a UDP LoadBalancer service on port 3630."
+  type        = bool
   default     = false
 }
 
