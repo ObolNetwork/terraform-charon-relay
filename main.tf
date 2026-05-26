@@ -242,12 +242,6 @@ resource "kubernetes_service_v1" "relay-tcp" {
       target_port = "3610"
     }
     port {
-      name        = "monitoring"
-      protocol    = "TCP"
-      port        = 3620
-      target_port = "3620"
-    }
-    port {
       name        = "bootnode-http"
       protocol    = "TCP"
       port        = 3640
@@ -260,6 +254,66 @@ resource "kubernetes_service_v1" "relay-tcp" {
     load_balancer_ip        = (lower(var.cloud_provider) == "gcp" && var.external_ips != null) ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
   }
+}
+
+# Separate ClusterIP-only Service for metrics so port 3620 is not exposed
+# by the public LoadBalancer above. In-cluster scrapers (ServiceMonitor or
+# Prometheus pod_sd) hit this Service instead.
+resource "kubernetes_service_v1" "relay-metrics" {
+  count = var.cluster_size
+  metadata {
+    name      = "${var.relay_name}-${count.index}-metrics"
+    namespace = kubernetes_namespace_v1.relay.id
+    labels = {
+      app                           = "${var.relay_name}-${count.index}"
+      "app.kubernetes.io/component" = "metrics"
+    }
+  }
+  spec {
+    type = "ClusterIP"
+    port {
+      name        = "monitoring"
+      protocol    = "TCP"
+      port        = 3620
+      target_port = "3620"
+    }
+    selector = {
+      app = "${var.relay_name}-${count.index}"
+    }
+  }
+}
+
+resource "kubernetes_manifest" "relay-servicemonitor" {
+  count = var.service_monitor_enabled ? var.cluster_size : 0
+  manifest = {
+    apiVersion = "monitoring.coreos.com/v1"
+    kind       = "ServiceMonitor"
+    metadata = {
+      name      = "${var.relay_name}-${count.index}"
+      namespace = kubernetes_namespace_v1.relay.id
+      labels = {
+        app = "${var.relay_name}-${count.index}"
+      }
+    }
+    spec = {
+      jobLabel = "${var.relay_name}-${count.index}"
+      selector = {
+        matchLabels = {
+          "app.kubernetes.io/component" = "metrics"
+          app                           = "${var.relay_name}-${count.index}"
+        }
+      }
+      namespaceSelector = {
+        matchNames = [kubernetes_namespace_v1.relay.id]
+      }
+      endpoints = [{
+        port     = "monitoring"
+        path     = "/metrics"
+        interval = "30s"
+      }]
+    }
+  }
+  depends_on = [kubernetes_service_v1.relay-metrics]
 }
 
 resource "kubernetes_service_v1" "relay-udp" {

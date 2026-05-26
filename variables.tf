@@ -19,6 +19,12 @@ variable "udp_enabled" {
   default     = false
 }
 
+variable "service_monitor_enabled" {
+  description = "Create a prometheus-operator ServiceMonitor targeting the metrics Service. Requires the ServiceMonitor CRD to be installed in the cluster."
+  type        = bool
+  default     = false
+}
+
 variable "cloud_provider" {
   description = "Cloud provider name. The module supports aws and gcp."
   type        = string
