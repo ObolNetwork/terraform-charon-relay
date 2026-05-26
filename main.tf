@@ -242,12 +242,6 @@ resource "kubernetes_service_v1" "relay-tcp" {
       target_port = "3610"
     }
     port {
-      name        = "monitoring"
-      protocol    = "TCP"
-      port        = 3620
-      target_port = "3620"
-    }
-    port {
       name        = "bootnode-http"
       protocol    = "TCP"
       port        = 3640
@@ -259,6 +253,26 @@ resource "kubernetes_service_v1" "relay-tcp" {
     type                    = "LoadBalancer"
     load_balancer_ip        = (lower(var.cloud_provider) == "gcp" && var.external_ips != null) ? var.external_ips[count.index] : null
     external_traffic_policy = "Local"
+  }
+}
+
+resource "kubernetes_service_v1" "relay-metrics" {
+  count = var.cluster_size
+  metadata {
+    name      = "${var.relay_name}-${count.index}-metrics"
+    namespace = kubernetes_namespace_v1.relay.id
+  }
+  spec {
+    port {
+      name        = "monitoring"
+      protocol    = "TCP"
+      port        = 3620
+      target_port = "3620"
+    }
+    selector = {
+      app = "${var.relay_name}-${count.index}"
+    }
+    type = "ClusterIP"
   }
 }
 
