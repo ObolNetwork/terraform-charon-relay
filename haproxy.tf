@@ -105,7 +105,7 @@ EOT
 ---
 image:
   registry: docker.io
-  repository: bitnamilegacy/haproxy
+  repository: ${var.haproxy_image}
 service:
   ports:
     - name: http
