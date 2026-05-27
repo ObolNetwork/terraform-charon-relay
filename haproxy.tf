@@ -103,9 +103,6 @@ EOT
   values = [
     <<EOF
 ---
-image:
-  registry: docker.io
-  repository: ${var.haproxy_image}
 service:
   ports:
     - name: http

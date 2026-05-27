@@ -47,12 +47,6 @@ variable "loki_endpoint" {
   default     = ""
 }
 
-variable "haproxy_image" {
-  description = "HAProxy container image repository"
-  type        = string
-  default     = "bitnami/haproxy"
-}
-
 variable "haproxy_chart_version" {
   description = "Haproxy helm chart version"
   type        = string
