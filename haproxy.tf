@@ -1,11 +1,12 @@
 resource "helm_release" "haproxy" {
-  name       = "haproxy"
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "haproxy"
-  version    = var.haproxy_chart_version
-  namespace  = var.relay_name
-  values     = local.values
-  depends_on = [kubernetes_namespace_v1.relay, kubernetes_config_map_v1.haproxy]
+  name         = "haproxy"
+  repository   = "oci://registry-1.docker.io/bitnamicharts"
+  chart        = "haproxy"
+  version      = var.haproxy_chart_version
+  namespace    = var.relay_name
+  values       = local.values
+  reset_values = true
+  depends_on   = [kubernetes_namespace_v1.relay, kubernetes_config_map_v1.haproxy]
 }
 
 resource "kubernetes_config_map_v1" "haproxy" {
