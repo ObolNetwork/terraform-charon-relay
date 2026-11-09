@@ -31,12 +31,13 @@ variable "external_ips" {
 }
 
 variable "primary_base_domain" {
-  description = "The primary base domain name to create relay subdomain. obol.tech -> relay-0.obol.tech"
+  description = "Deprecated, unused since the nginx Ingress was removed. The primary base domain name to create relay subdomain. obol.tech -> relay-0.obol.tech"
   type        = string
+  default     = null
 }
 
 variable "extra_domains" {
-  description = "List of extra domains"
+  description = "Deprecated, unused since the nginx Ingress was removed. List of extra domains"
   type        = list(string)
   default     = []
 }
@@ -144,13 +145,13 @@ variable "topology_spread_enabled" {
 }
 
 variable "auto_create_tls" {
-  description = "Flag to enable cert-manager annotations to auto generate tls certificates"
+  description = "Deprecated, unused since the nginx Ingress was removed. Flag to enable cert-manager annotations to auto generate tls certificates"
   type        = bool
   default     = true
 }
 
 variable "auto_create_dns" {
-  description = "Flag to enable external-dns annotations to auto generate dns records"
+  description = "Deprecated, unused since the nginx Ingress was removed. Flag to enable external-dns annotations to auto generate dns records"
   type        = bool
   default     = true
 }
