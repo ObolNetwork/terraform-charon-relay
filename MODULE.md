@@ -24,7 +24,6 @@ No modules.
 | [helm_release.haproxy](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_config_map_v1.haproxy](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map_v1) | resource |
 | [kubernetes_config_map_v1.relay](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map_v1) | resource |
-| [kubernetes_ingress_v1.secondary-domain](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/ingress_v1) | resource |
 | [kubernetes_namespace_v1.relay](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1) | resource |
 | [kubernetes_pod_disruption_budget_v1.relay](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/pod_disruption_budget_v1) | resource |
 | [kubernetes_service_v1.relay-tcp](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_v1) | resource |
@@ -47,7 +46,7 @@ No modules.
 | <a name="input_memory_limits"></a> [memory\_limits](#input\_memory\_limits) | Relay pod memory limits | `string` | `"1Gi"` | no |
 | <a name="input_memory_requests"></a> [memory\_requests](#input\_memory\_requests) | Relay pod memory requests | `string` | `"1Gi"` | no |
 | <a name="input_node_selector_enabled"></a> [node\_selector\_enabled](#input\_node\_selector\_enabled) | Enable node selector | `bool` | `false` | no |
-| <a name="input_primary_base_domain"></a> [primary\_base\_domain](#input\_primary\_base\_domain) | The primary base domain name to create relay subdomain. obol.tech -> relay-0.obol.tech | `string` | n/a | yes |
+| <a name="input_primary_base_domain"></a> [primary\_base\_domain](#input\_primary\_base\_domain) | Deprecated, unused since the nginx Ingress was removed. The primary base domain name to create relay subdomain. obol.tech -> relay-0.obol.tech | `string` | `null` | no |
 | <a name="input_relay_name"></a> [relay\_name](#input\_relay\_name) | Relay cluster name | `string` | n/a | yes |
 | <a name="input_relay_version"></a> [relay\_version](#input\_relay\_version) | Charon image tag to use to deploy the relay statefulset | `string` | n/a | yes |
 | <a name="input_secondary_base_domain"></a> [secondary\_base\_domain](#input\_secondary\_base\_domain) | (Optional) The secondary base domain name to create relay subdomain. obol.dev -> relay-0.obol.dev | `string` | `""` | no |

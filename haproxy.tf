@@ -57,30 +57,6 @@ ${local.servers_config}
 locals {
   servers_config = trim(join("", formatlist("%s \n", null_resource.backend_servers[*].triggers.server)), ",")
 
-  cert_manager_annotations = var.auto_create_tls ? [
-    "cert-manager.io/cluster-issuer: \"letsencrypt\"",
-    "cert-manager.io/issue-temporary-certificate: \"true\"",
-    "acme.cert-manager.io/http01-edit-in-place: \"true\""
-  ] : []
-  cert_manager_annotations_yaml = join("\n", local.cert_manager_annotations)
-
-  tls_yaml = join("", [
-    for domain in concat(var.extra_domains) : <<EOT
-  - hosts:
-    - ${domain}
-    secretName: ${replace(domain, ".", "-")}-tls
-EOT
-  ])
-
-  extra_domains_yaml = length(var.extra_domains) > 0 ? join("", [
-    for host in var.extra_domains : <<EOT
-    - name: "${host}"
-      path: /
-EOT
-  ]) : ""
-
-  dns_annotations_yaml = var.auto_create_dns ? "" : "external-dns.alpha.kubernetes.io/hostname: \"\""
-
   topology_spread_yaml = var.topology_spread_enabled ? join("\n", [
     "topologySpreadConstraints:",
     "  - maxSkew: 1",
@@ -121,19 +97,6 @@ containerPorts:
   - name: stats
     containerPort: 8404
 existingConfigmap: haproxy
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  hostname: ${var.relay_name}.${var.primary_base_domain}
-  annotations:
-    ${indent(4, local.cert_manager_annotations_yaml)}
-    ${indent(4, local.dns_annotations_yaml)}
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-${length(var.extra_domains) > 0 ? "  extraHosts:" : ""}
-${local.extra_domains_yaml}
-  tls: true
-${length(var.extra_domains) > 0 ? "  extraTls:" : ""}
-${local.tls_yaml}
 ${local.node_selector_yaml}
 ${local.topology_spread_yaml}
 EOF
